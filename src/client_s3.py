@@ -24,29 +24,38 @@ class S3:
             self.create_folder(self.output_dir)
 
     def get_client(self):
-        if not all([self.region, self.access_key, self.secret_key, self.bucket_name]):
-            err = "Missing required S3 environment variables."
-            logger.error(err)
+        if not self.region:
+            logger.error("S3_REGION is required.")
+        if not self.bucket_name:
+            logger.error("S3_BUCKET_NAME is required.")
     
         try:
             addressing_style = os.getenv("S3_ADDRESSING_STYLE", "auto")
-            if addressing_style not in ["auto", "virtual", "path"]:
-                logger.warning(f"Invalid S3_ADDRESSING_STYLE value: {addressing_style}, using 'auto' instead")
-                addressing_style = "auto"
-            s3_config = Config(
-                s3={
-                    'addressing_style': addressing_style  # S3 addressing_style: auto/virtual/path
-                }
-            )
+            cfg_kwargs = {}
+            if addressing_style in ("virtual", "path"):
+                cfg_kwargs["s3"] = {"addressing_style": addressing_style}
+            elif addressing_style != "auto":
+                logger.warning(f"Invalid S3_ADDRESSING_STYLE='{addressing_style}', falling back to default(auto).")
+            s3_config = Config(**cfg_kwargs)
 
-            s3 = boto3.resource(
-                service_name='s3',
-                region_name=self.region,
-                aws_access_key_id=self.access_key,
-                aws_secret_access_key=self.secret_key,
-                endpoint_url=self.endpoint_url,
-                config=s3_config
-            )
+            if self.access_key and self.secret_key:
+                logger.info("[S3] Using explicit credentials from env.")
+                s3 = boto3.resource(
+                    service_name='s3',
+                    region_name=self.region,
+                    aws_access_key_id=self.access_key,
+                    aws_secret_access_key=self.secret_key,
+                    endpoint_url=self.endpoint_url,
+                    config=s3_config
+                )
+            else:
+                logger.info("[S3] Using default AWS credential chain (instance profile/IMDS/etc).")
+                s3 = boto3.resource(
+                    service_name='s3',
+                    region_name=self.region,
+                    endpoint_url=self.endpoint_url,
+                    config=s3_config
+                )
             return s3
         except Exception as e:
             err = f"Failed to create S3 client: {e}"
