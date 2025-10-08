@@ -8,6 +8,6 @@ cd comfyui-s3
 
 pip install requirements.txt
 
-# S3_REGION, S3_BUCKET_NAMEを設定
+# 環境変数を設定
 vi .env
 ```
