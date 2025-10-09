@@ -28,6 +28,10 @@ class S3:
             logger.error("S3_REGION is required.")
         if not self.bucket_name:
             logger.error("S3_BUCKET_NAME is required.")
+        if not self.input_dir:
+            logger.error("S3_INPUT_DIR is required.")
+        if not self.output_dir:
+            logger.error("S3_OUTPUT_DIR is required.")
     
         try:
             addressing_style = os.getenv("S3_ADDRESSING_STYLE", "auto")
