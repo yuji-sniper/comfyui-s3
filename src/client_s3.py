@@ -66,7 +66,7 @@ class S3:
             try:
                 bucket = self.s3_client.Bucket(self.bucket_name)
                 files = [obj.key for obj in bucket.objects.filter(Prefix=prefix)]
-                files = [f.replace(prefix, "") for f in files]
+                files = [f.replace(f"{prefix}/", "") for f in files if f != f"{prefix}/"]
                 return files
             except Exception as e:
                 err = f"Failed to get files from S3: {e}"
