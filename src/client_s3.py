@@ -62,6 +62,8 @@ class S3:
             logger.error(err)
 
     def get_files(self, prefix):
+        if prefix.endswith("/"):
+            prefix = prefix[:-1]
         if self.does_folder_exist(prefix):
             try:
                 bucket = self.s3_client.Bucket(self.bucket_name)
@@ -75,6 +77,8 @@ class S3:
             return []
     
     def does_folder_exist(self, folder_name):
+        if folder_name.endswith("/"):
+            folder_name = folder_name[:-1]
         try:
             bucket = self.s3_client.Bucket(self.bucket_name)
             response = bucket.objects.filter(Prefix=folder_name)
