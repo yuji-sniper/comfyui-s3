@@ -16,8 +16,8 @@ class S3:
         self.bucket_name = bucket_name
         self.endpoint_url = endpoint_url
         self.s3_client = self.get_client()
-        self.input_dir = os.getenv("S3_INPUT_DIR", "")
-        self.output_dir = os.getenv("S3_OUTPUT_DIR", "")
+        self.input_dir = os.getenv("S3_INPUT_DIR")
+        self.output_dir = os.getenv("S3_OUTPUT_DIR")
         if not self.does_folder_exist(self.input_dir):
             self.create_folder(self.input_dir)
         if not self.does_folder_exist(self.output_dir):
